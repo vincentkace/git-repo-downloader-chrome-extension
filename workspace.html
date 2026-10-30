@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browser Git Clone</title>
+  <style>
+    :root { color-scheme: light; font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: #182230; background: #f4f7fb; }
+    * { box-sizing: border-box; }
+    body { max-width: 880px; margin: 32px auto; padding: 0 18px; }
+    main { padding: 24px; border: 1px solid #d8e0e8; border-radius: 12px; background: #fff; box-shadow: 0 4px 20px #1b35551a; }
+    h1 { margin: 0 0 4px; font-size: 24px; }
+    p { color: #52606d; }
+    label { display: block; margin: 15px 0 5px; font-weight: 650; }
+    input { width: 100%; padding: 10px 12px; border: 1px solid #b8c2cc; border-radius: 7px; font: inherit; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    button { margin: 16px 8px 0 0; padding: 10px 16px; border: 0; border-radius: 7px; background: #1769e0; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #e8edf3; color: #182230; }
+    button:disabled { opacity: .55; cursor: wait; }
+    progress { width: 100%; height: 16px; margin-top: 16px; }
+    #status { min-height: 48px; margin-top: 10px; padding: 10px; border-radius: 7px; background: #f2f5f8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #status[data-kind="error"] { background: #fff0ee; color: #a5291c; }
+    #status[data-kind="success"] { background: #ecfdf3; color: #067647; }
+    .note { font-size: 13px; }
+    .auth-box { margin-top: 20px; padding: 16px; border: 1px solid #d8e0e8; border-radius: 9px; background: #f8fafc; }
+    .auth-box h2 { margin: 0; font-size: 18px; }
+    .auth-box p { margin: 6px 0; }
+    .auth-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .auth-actions button { margin: 8px 0 0; }
+    #githubAuthStatus { min-height: 24px; margin-top: 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #githubAuthStatus[data-kind="error"] { color: #a5291c; }
+    #githubAuthStatus[data-kind="success"] { color: #067647; }
+    #deviceCode { display: inline-block; margin: 8px 0; padding: 6px 10px; border-radius: 6px; background: #e8edf3; font: 700 22px/1.2 ui-monospace, monospace; letter-spacing: 2px; }
+    code { background: #edf1f5; padding: 1px 4px; border-radius: 3px; }
+    @media (max-width: 620px) { .grid { grid-template-columns: 1fr; gap: 0; } body { margin: 14px auto; } main { padding: 18px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Browser Git Clone</h1>
+  <p>在浏览器中执行真正的 Git HTTPS 克隆，保留完整提交历史、分支、标签和 <code>.git</code> 元数据。</p>
+
+  <label for="repo">Git HTTPS 仓库地址</label>
+  <input id="repo" type="url" placeholder="https://gitee.com/owner/repo.git" autocomplete="url">
+
+  <label for="branch">要检出的分支（可选）</label>
+  <input id="branch" type="text" placeholder="留空使用仓库默认分支，例如 main 或 feature/login" autocomplete="off" spellcheck="false">
+  <p class="note">会检出此分支的文件，同时仍下载所有分支、标签和完整 Git 历史。分支名区分大小写。</p>
+
+  <section class="auth-box" aria-labelledby="serviceAuthHeading">
+    <h2 id="serviceAuthHeading">Gitee / 其他 Git 服务认证</h2>
+    <p class="note">公开仓库无需填写。克隆 Gitee 等服务的私有仓库时，在这里填写该服务的 Git HTTPS 用户名和密码 / 访问令牌（两项都填）。如果服务不接受账户密码，请使用它提供的 Git 访问令牌。</p>
+    <div class="grid">
+      <div>
+        <label for="username">Git HTTPS 用户名</label>
+        <input id="username" type="text" autocomplete="off" placeholder="例如 Gitee 用户名">
+      </div>
+      <div>
+        <label for="password">Git 密码 / 访问令牌</label>
+        <input id="password" type="password" autocomplete="off" placeholder="Gitee 密码或访问令牌">
+      </div>
+    </div>
+    <p class="note">GitHub 账户登录密码不能用于 Git HTTPS。启用了两步验证（2FA）的 GitHub 账号，请使用下方 GitHub App 授权；也可以把 GitHub 访问令牌填在这里作为密码。凭据只在本次克隆期间保存在页面内存。</p>
+  </section>
+
+  <section class="auth-box" aria-labelledby="githubAuthHeading">
+    <h2 id="githubAuthHeading">GitHub 私有仓库授权（启用 2FA 推荐）</h2>
+    <p class="note">公开仓库无需登录。克隆 github.com 私有仓库时，启用了 2FA 的账号推荐使用此授权方式。首次使用请在 GitHub → Settings → Developer settings → GitHub Apps → New GitHub App 创建 App，启用 Device Flow，并将 Contents 权限设为 Read-only。</p>
+    <label for="githubClientId">GitHub App Client ID</label>
+    <input id="githubClientId" type="text" autocomplete="off" spellcheck="false" placeholder="Iv1.xxxxxxxxxxxxxxxxxxxx">
+    <p class="note">复制 App 设置页中的 Client ID（不是 App ID）并粘贴到这里。点击“连接 GitHub”后，打开授权页面输入一次性验证码，再完成登录和 2FA。授权只用于 GitHub。</p>
+    <div class="auth-actions">
+      <button id="saveGithubClientId" class="secondary">保存 Client ID</button>
+      <button id="connectGithub">连接 GitHub</button>
+      <button id="disconnectGithub" class="secondary" disabled>退出登录</button>
+    </div>
+    <div id="githubAuthStatus" role="status">尚未连接 GitHub。</div>
+    <div id="deviceCodeContainer" hidden>
+      <div>请打开 <a id="deviceCodeLink" href="https://github.com/login/device" target="_blank" rel="noopener">GitHub 设备授权页面</a> 并输入此验证码：</div>
+      <div id="deviceCode"></div>
+      <div class="note">授权完成后此页面会自动继续。请确认页面地址为 github.com。</div>
+    </div>
+  </section>
+
+  <button id="clone">克隆完整仓库</button>
+  <button id="export" class="secondary" disabled>导出包含 .git 的 ZIP</button>
+  <button id="clearCache" class="secondary">清除缓存</button>
+  <progress id="progress" max="100" value="0"></progress>
+  <div id="status" role="status">等待输入仓库地址。</div>
+</main>
+<script src="vendor.js"></script>
+<script src="workspace.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "git-repo-downloader",
+  "version": "0.2.0",
+  "description": "A browser-only Git HTTPS clone extension that preserves complete repository history.",
+  "main": "popup.js",
+  "scripts": {
+    "build": "esbuild vendor-entry.js --bundle --minify --format=iife --platform=browser --outfile=vendor.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@isomorphic-git/lightning-fs": "^4.10.3",
+    "buffer": "^6.0.3",
+    "fflate": "^0.8.3",
+    "isomorphic-git": "^1.43.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

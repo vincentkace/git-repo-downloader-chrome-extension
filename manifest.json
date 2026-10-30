@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Browser Git Clone",
+  "version": "0.4.2",
+  "description": "Clone Git HTTPS repositories in the browser and export them with .git history.",
+  "permissions": ["storage"],
+  "optional_host_permissions": ["https://*/*"],
+  "action": {
+    "default_title": "Browser Git Clone",
+    "default_popup": "popup.html"
+  }
+}
